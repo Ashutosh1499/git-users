@@ -1,25 +1,46 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Search from './Components/Search';
+import UserList from './Components/UserList';
+import Githubservices from './Utils/Githubservices';
+import { fetchData } from './Utils/fetchData';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [users, setUsers] = useState([]);
+
+	const searchUsers = async query => {
+		try {
+			// const searchResults = await GitHubService.searchUsers(query);
+			const searchResults = await Githubservices.searchUsers(query);
+			setUsers(searchResults);
+		} catch (error) {
+			// Handle error
+		}
+	};
+	useEffect(() => {
+		const fetchRandomData = async () => {
+			try {
+				const response = await fetchData('', '');
+				setUsers(response);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		fetchRandomData();
+	}, []);
+
+	return (
+		<div>
+			<Search onSearch={searchUsers} />
+			{users.length === 0 ? (
+				<div style={{ width: '100%', textAlign: 'center' }}>
+					No User with this name
+				</div>
+			) : (
+				<UserList users={users} />
+			)}
+		</div>
+	);
 }
 
 export default App;
